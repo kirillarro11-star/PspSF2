@@ -1,0 +1,23 @@
+name: Build PSP EBOOT
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: pspdev/pspdev:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check SDK
+        run: |
+          which psp-config || echo "NO psp-config"
+          psp-config --pspsdk-path || echo "NO path"
+      - name: Build
+        run: |
+          export PATH=$PATH:/usr/local/pspdev/bin
+          make
+      - name: Upload EBOOT
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: EBOOT
+          path: EBOOT.PBP
